@@ -33,11 +33,14 @@ GPU_FLAVOR_PREFIXES = (
 )
 
 
-def resolve_label(labels: list[str]) -> str | None:
-    """Return the first `hf-jobs-*` label we know about, or None."""
-    for label in labels:
-        if label in LABEL_TO_FLAVOR:
-            return label
+def resolve_label(labels: list[str]) -> tuple[str, str, str] | None:
+    """Return the first `hf-jobs-*` label we know about plus image label and original GH label, or None."""
+    for gh_label in labels:
+        label = gh_label.split(":")
+        if len(label) <= 2:
+            label += [""]
+            if label[0] in LABEL_TO_FLAVOR:
+                return label[0], label[1], gh_label
     return None
 
 

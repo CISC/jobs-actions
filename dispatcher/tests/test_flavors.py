@@ -15,7 +15,14 @@ def test_label_map_includes_common_flavors():
 
 
 def test_resolve_label_finds_first_match():
-    assert resolve_label(["self-hosted", "hf-jobs-cpu-basic"]) == "hf-jobs-cpu-basic"
+    labels = resolve_label(["self-hosted", "hf-jobs-cpu-basic"])
+    assert labels
+    assert labels[0] == "hf-jobs-cpu-basic"
+    labels = resolve_label(["self-hosted", "hf-jobs-cpu-basic:gpu"])
+    assert labels
+    assert labels[0] == "hf-jobs-cpu-basic"
+    assert labels[1] == "gpu"
+    assert labels[2] == "hf-jobs-cpu-basic:gpu"
 
 
 def test_resolve_label_returns_none_when_no_match():
@@ -23,6 +30,8 @@ def test_resolve_label_returns_none_when_no_match():
     assert resolve_label([]) is None
     # Unknown hf-jobs label that isn't in the SpaceHardware enum
     assert resolve_label(["hf-jobs-not-a-real-flavor"]) is None
+    # Too many label separators
+    assert resolve_label(["hf-jobs-cpu-basic:gpu:none"]) is None
 
 
 def test_is_gpu_flavor_classification():
